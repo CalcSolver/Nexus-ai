@@ -95,8 +95,8 @@
             </button>
         </div>
 
-        <!-- Action Button -->
-        <div class="p-3">
+        <!-- Action Buttons -->
+        <div class="p-3 space-y-2">
             <button id="newChatBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-blue-600 hover:from-brand-500 hover:to-blue-500 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 shadow-md shadow-brand-600/20 text-xs">
                 <i class="fa-solid fa-plus text-xs"></i>
                 <span>New Conversation</span>
@@ -130,7 +130,7 @@
 
     <main class="flex-1 flex flex-col h-full bg-darkBg relative overflow-hidden">
         
-        <!-- Top Navigation -->
+        <!-- Top Navigation Bar -->
         <header class="h-14 border-b border-darkBorder flex items-center justify-between px-4 bg-darkBg/90 backdrop-blur z-10">
             <div class="flex items-center gap-3">
                 <button id="openSidebarMobileBtn" class="md:hidden text-gray-400 hover:text-white p-2">
@@ -138,14 +138,18 @@
                 </button>
                 <div class="relative">
                     <select id="modelSelector" class="bg-darkPanel text-gray-200 hover:text-white text-xs font-medium px-3 py-1.5 rounded-xl border border-darkBorder focus:outline-none focus:border-brand-500 cursor-pointer transition">
-                        <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (Recommended)</option>
-                        <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview</option>
-                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Default)</option>
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                        <option value="gemini-3.8-flash">Gemini 3.8 Flash (Next-Gen)</option>
                     </select>
                 </div>
             </div>
 
             <div class="flex items-center gap-1.5">
+                <button id="importChatBtn" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-darkPanel transition" title="Import Chat JSON">
+                    <i class="fa-solid fa-upload text-xs"></i>
+                </button>
+                <input type="file" id="importFileInput" class="hidden" accept=".json">
                 <button id="exportChatBtn" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-darkPanel transition" title="Export Chat JSON">
                     <i class="fa-solid fa-download text-xs"></i>
                 </button>
@@ -164,7 +168,7 @@
                     N
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">How can Nexus AI help you today?</h1>
-                <p class="text-gray-400 max-w-md text-xs sm:text-sm mb-8">Enter your Gemini API key in Settings to begin chatting using the latest Gemini models.</p>
+                <p class="text-gray-400 max-w-md text-xs sm:text-sm mb-8">Enter your Gemini API key in Settings to begin chatting using Google's models.</p>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
                     <button class="sample-prompt p-3 rounded-xl border border-darkBorder bg-darkPanel/50 hover:bg-darkPanel text-left transition group">
@@ -209,7 +213,7 @@
                 </div>
             </form>
             <div class="text-center text-[11px] text-gray-500 mt-2">
-                Nexus AI connects directly to Google Gemini APIs. Verify output independently.
+                Nexus AI connects directly to Google Gemini APIs.
             </div>
         </div>
     </main>
@@ -299,7 +303,7 @@
             apiKey: localStorage.getItem('nexus_api_key') || '',
             systemPrompt: localStorage.getItem('nexus_system_prompt') || 'You are Nexus AI, a helpful, precise, and concise assistant.',
             temperature: parseFloat(localStorage.getItem('nexus_temperature')) || 0.7,
-            model: localStorage.getItem('nexus_selected_model') || 'gemini-3.8-flash',
+            model: localStorage.getItem('nexus_selected_model') || 'gemini-2.5-flash',
             conversations: JSON.parse(localStorage.getItem('nexus_conversations') || '[]'),
             currentChatId: null,
             isGenerating: false
@@ -334,6 +338,8 @@
             apiStatusText: document.getElementById('apiStatusText'),
             clearChatBtn: document.getElementById('clearChatBtn'),
             exportChatBtn: document.getElementById('exportChatBtn'),
+            importChatBtn: document.getElementById('importChatBtn'),
+            importFileInput: document.getElementById('importFileInput'),
             toastContainer: document.getElementById('toastContainer')
         };
 
@@ -416,6 +422,8 @@
 
             elements.clearChatBtn.addEventListener('click', clearCurrentChat);
             elements.exportChatBtn.addEventListener('click', exportCurrentChat);
+            elements.importChatBtn.addEventListener('click', () => elements.importFileInput.click());
+            elements.importFileInput.addEventListener('change', importChatFromFile);
 
             document.querySelectorAll('.sample-prompt').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -562,6 +570,33 @@
             showToast('Exported conversation as JSON', 'success');
         }
 
+        function importChatFromFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    if (imported && imported.messages && Array.isArray(imported.messages)) {
+                        imported.id = 'chat_' + Date.now();
+                        imported.title = imported.title || 'Imported Chat';
+                        state.conversations.unshift(imported);
+                        saveConversations();
+                        renderChatHistory();
+                        loadChat(imported.id);
+                        showToast('Conversation imported successfully!', 'success');
+                    } else {
+                        showToast('Invalid chat JSON format', 'error');
+                    }
+                } catch (err) {
+                    showToast('Failed to parse JSON file', 'error');
+                }
+                elements.importFileInput.value = '';
+            };
+            reader.readAsText(file);
+        }
+
         function appendMessageUI(role, text) {
             const isUser = role === 'user';
             const wrapper = document.createElement('div');
@@ -700,7 +735,7 @@
                 const errData = await response.json().catch(() => ({}));
                 const apiErrorMsg = errData.error?.message || `API Error (${response.status})`;
                 
-                // Fallback attempt with non-streaming endpoint
+                // Fallback attempt with standard generateContent endpoint if streaming is blocked/unsupported
                 return await generateContentFallback(payload, apiKey, onChunk, apiErrorMsg);
             }
 
@@ -762,7 +797,6 @@
             }
         }
 
-        // Toast Helper
         function showToast(msg, type = 'info') {
             const toast = document.createElement('div');
             const colors = {
