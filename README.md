@@ -1,96 +1,98 @@
-# ⚡ Nexus AI - Modern Conversational Intelligence
+⚡ Nexus AI — Modern Conversational Intelligence
+A lightweight, high‑performance, single‑file ChatGPT‑style web application powered directly by Google’s official Gemini REST API.
+Built with a sleek dark‑mode UI, real‑time streaming, Markdown rendering, and dynamic model switching — all inside one HTML file.
 
-A lightweight, high-performance, single-file ChatGPT-style web application powered directly by Google's official Gemini REST API. Designed with a sleek dark-mode UI, real-time response streaming, Markdown rendering, and dynamic model switching.
+🚀 Features at a Glance
+🔥 Real‑Time SSE Streaming
+Experience smooth, live token streaming directly from Gemini REST endpoints.
 
-## ✨ Key Features
+🎯 Multiple Model Support
+Switch between supported Gemini models instantly:
 
-🚀 Live SSE Streaming: Experience real-time token streaming direct from Google Gemini REST endpoints.
+gemini‑2.5‑flash — Best balance of speed + intelligence
 
-🎯 Multiple Model Support: Toggle between supported Gemini models seamlessly:
+gemini‑2.5‑pro — Advanced reasoning
 
-gemini-2.5-flash (Recommended for balance and speed)
+gemini‑2.0‑flash — Ultra‑fast responses
 
-gemini-2.5-pro (Advanced reasoning)
+🔒 Secure Local Storage
+Your API key stays only in your browser via localStorage.
+No backend. No server. No risk.
 
-gemini-2.0-flash (Ultra-fast response generation)
+🎨 Modern Dark UI
+Responsive layout, sidebar navigation, conversation history, auto‑resizing input, and mobile‑friendly design.
 
-🔒 Secure Local Storage: Your API Key and custom configuration stay local in your browser's localStorage—no middleman or backend server involved.
+📝 Markdown + Code Highlighting
+Powered by Marked.js + Highlight.js, including one‑click code copy buttons.
 
-🎨 Modern Dark UI: Sleek sidebar navigation, dynamic conversation history, auto-resizing input area, and responsive design for both desktop and mobile.
+⚙️ Custom System Instructions
+Editable system prompt + temperature slider for creativity control.
 
-📝 Code Highlighting & Copy: Rendered Markdown responses powered by Marked.js and syntax highlighted with Highlight.js, complete with one-click code copy buttons.
-
-⚙️ Custom System Instructions: Custom prompt engineering with an editable temperature slider (creativity tuning).
-
-📦 Zero Build Tooling Required: Pure single HTML file (index.html) using Tailwind CSS and FontAwesome CDN assets.
+📦 Zero Build Tools Needed
+A single index.html using TailwindCSS + FontAwesome CDNs.
+No bundlers. No Node. No setup.
 
 🛠️ Quick Start (Local Setup)
-
-Clone or Download the Repository:
-
+1️⃣ Clone the Repository
+bash
 git clone https://github.com/YOUR_USERNAME/nexus-ai.git
 cd nexus-ai
+2️⃣ Run the App
+Just open index.html in any browser — that’s it.
 
+3️⃣ Add Your API Key
+Open Settings → API Keys
 
-Run the Application:
-Since Nexus AI is built as a self-contained single-page application (index.html), simply open index.html directly in any web browser!
+Paste your Gemini API key (get one free at Google AI Studio)
 
-Configure your API Key:
+Click Save Configuration
 
-Click Settings & API Keys in the bottom-left sidebar.
-
-Enter your Gemini API Key (obtain a free key at Google AI Studio).
-
-Click Save Configuration.
-
-☁️ Deployment Guide (GitHub to Vercel)
-
-Nexus AI can be deployed to Vercel in under 60 seconds with zero backend configuration.
-
-Step 1: Push code to GitHub
-
+☁️ Deploying to Vercel (60 Seconds)
+1️⃣ Push to GitHub
+bash
 git init
 git add index.html README.md
 git commit -m "Initial commit of Nexus AI"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/nexus-ai.git
 git push -u origin main
+2️⃣ Deploy on Vercel
+Log in to Vercel
 
+Click Add New → Project
 
-Step 2: Deploy on Vercel
+Import your GitHub repo
 
-Log in to Vercel.
+Framework preset: Other / Static
 
-Click Add New > Project.
+Click Deploy
 
-Import your nexus-ai repository from GitHub.
-
-Keep the framework preset as Other / Static and click Deploy.
-
-Your live app URL will be ready instantly with free SSL!
+Your live URL appears instantly — with free SSL.
 
 🔑 Security & API Key Management
+⚠️ Never commit your API key to GitHub.
 
-[!WARNING]
+Nexus AI uses client‑side storage only:
 
-Never commit hardcoded API keys directly into your GitHub repository!
+API key saved in localStorage
 
-Client-Side Storage: By default, Nexus AI asks the user to enter their API Key via the UI. The key is securely saved only in the visitor's web browser (window.localStorage).
+Requests sent directly from browser → https://generativelanguage.googleapis.com
 
-Direct Requests: API calls are made directly from the user's browser client to https://generativelanguage.googleapis.com.
+No backend server involved
 
-🔮 Roadmap & Cloud Sync (Firebase Setup)
+This keeps your key private and secure.
 
-Nexus AI is designed with optional Firebase integration for multi-device cross-platform synchronization.
-
-Planned expansion:
+🔮 Roadmap — Optional Firebase Cloud Sync
+Future planned features:
 
 [ ] Google OAuth / Firebase Authentication
 
-[ ] Cloud Firestore history persistence across devices
+[ ] Cloud Firestore conversation syncing
 
-[ ] Image uploading & Multimodal input support
+[ ] Image uploads + multimodal input
+
+These will allow multi‑device history and advanced AI interactions.
 
 📄 License
-
-Distributed under the MIT License. See LICENSE for more information.
+Distributed under the MIT License.
+See LICENSE for full details.
