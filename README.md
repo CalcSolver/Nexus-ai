@@ -1,8 +1,8 @@
-**⚡ Nexus AI - Modern Conversational Intelligence**
+#⚡ Nexus AI - Modern Conversational Intelligence#
 
 A lightweight, high-performance, single-file ChatGPT-style web application powered directly by Google's official Gemini REST API. Designed with a sleek dark-mode UI, real-time response streaming, Markdown rendering, and dynamic model switching.
 
-✨ Key Features
+##✨ Key Features##
 
 🚀 Live SSE Streaming: Experience real-time token streaming direct from Google Gemini REST endpoints.
 
