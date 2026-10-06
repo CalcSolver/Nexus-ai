@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI - Modern Conversational Intelligence</title>
+    <title>Nexus AI - Conversational Intelligence</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -117,10 +117,6 @@
                 </span>
                 <span id="keyStatusBadge" class="px-1.5 py-0.5 rounded text-[10px] bg-red-950 text-red-400 border border-red-800/50">Setup Key</span>
             </div>
-            <div class="flex items-center justify-between text-[11px] text-gray-500 border-t border-darkBorder/50 pt-1.5">
-                <span>Firebase Sync</span>
-                <span id="firebaseStatus" class="text-amber-500">Local Mode</span>
-            </div>
         </div>
 
         <!-- Sidebar Footer -->
@@ -142,9 +138,9 @@
                 </button>
                 <div class="relative">
                     <select id="modelSelector" class="bg-darkPanel text-gray-200 hover:text-white text-xs font-medium px-3 py-1.5 rounded-xl border border-darkBorder focus:outline-none focus:border-brand-500 cursor-pointer transition">
-                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Recommended)</option>
-                        <option value="gemini-2.5-pro">Gemini 2.5 Pro (Reasoning)</option>
-                        <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fast)</option>
+                        <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (Recommended)</option>
+                        <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview</option>
+                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                     </select>
                 </div>
             </div>
@@ -155,10 +151,6 @@
                 </button>
                 <button id="clearChatBtn" class="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-darkPanel transition" title="Clear Messages">
                     <i class="fa-solid fa-trash-can text-xs"></i>
-                </button>
-                <button id="deployGuideBtn" class="hidden sm:flex items-center gap-1.5 text-xs bg-slate-800/80 hover:bg-slate-700 text-brand-400 border border-brand-500/30 px-3 py-1.5 rounded-xl transition ml-2">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span>Deploy Guide</span>
                 </button>
             </div>
         </header>
@@ -172,7 +164,7 @@
                     N
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">How can Nexus AI help you today?</h1>
-                <p class="text-gray-400 max-w-md text-xs sm:text-sm mb-8">Enter your Gemini API key in Settings to begin chatting with high-speed intelligence.</p>
+                <p class="text-gray-400 max-w-md text-xs sm:text-sm mb-8">Enter your Gemini API key in Settings to begin chatting using the latest Gemini models.</p>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
                     <button class="sample-prompt p-3 rounded-xl border border-darkBorder bg-darkPanel/50 hover:bg-darkPanel text-left transition group">
@@ -181,7 +173,7 @@
                     </button>
                     <button class="sample-prompt p-3 rounded-xl border border-darkBorder bg-darkPanel/50 hover:bg-darkPanel text-left transition group">
                         <div class="text-xs font-semibold text-purple-400 mb-1 group-hover:text-purple-300">Architecture Planning</div>
-                        <div class="text-xs text-gray-300">Explain how to deploy a full-stack static site using Vercel & Firebase</div>
+                        <div class="text-xs text-gray-300">Explain how to deploy a full-stack static site using Vercel</div>
                     </button>
                 </div>
             </div>
@@ -203,7 +195,7 @@
                 <div class="flex items-center justify-between px-3 pb-3">
                     <div class="flex items-center gap-2">
                         <span class="text-[11px] text-gray-500 flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-xs text-emerald-500"></i> Client Direct Stream
+                            <i class="fa-solid fa-shield-halved text-xs text-emerald-500"></i> Local Key Connection
                         </span>
                     </div>
                     <button 
@@ -217,7 +209,7 @@
                 </div>
             </form>
             <div class="text-center text-[11px] text-gray-500 mt-2">
-                Nexus AI uses official Gemini REST APIs. Verify output independently.
+                Nexus AI connects directly to Google Gemini APIs. Verify output independently.
             </div>
         </div>
     </main>
@@ -232,7 +224,7 @@
             <div class="p-5 border-b border-darkBorder flex items-center justify-between bg-darkSidebar">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-sliders text-brand-500"></i>
-                    <h2 class="font-bold text-gray-100 text-base">Configuration & Settings</h2>
+                    <h2 class="font-bold text-gray-100 text-base">Settings & API Configuration</h2>
                 </div>
                 <button id="closeSettingsBtn" class="text-gray-400 hover:text-white">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -256,7 +248,7 @@
                     </div>
                     <div class="flex items-center justify-between text-xs">
                         <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-brand-400 hover:underline flex items-center gap-1">
-                            <span>Get free key from Google AI Studio</span>
+                            <span>Get a key from Google AI Studio</span>
                             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                         </a>
                         <button id="clearKeyBtn" class="text-red-400 hover:underline">Remove Saved Key</button>
@@ -266,16 +258,16 @@
                 <!-- API Key Storage Info -->
                 <div class="bg-blue-950/40 border border-blue-800/40 rounded-xl p-4 text-xs leading-relaxed space-y-2">
                     <div class="font-semibold text-blue-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-shield-cat text-sm"></i> Where is your API Key stored?
+                        <i class="fa-solid fa-shield-cat text-sm"></i> Local Browser Storage
                     </div>
                     <p class="text-gray-300">
-                        Your key is saved directly inside your browser's private <code class="bg-darkBg px-1 py-0.5 rounded text-blue-300">localStorage</code>. It connects directly from your device to Google's official endpoints—it is never transmitted to any third-party backend.
+                        Your key is saved directly inside your browser's local storage (`nexus_api_key`). It is never sent to any server other than official Google API endpoints.
                     </p>
                 </div>
 
                 <!-- System Instructions -->
                 <div class="space-y-2">
-                    <label class="block font-semibold text-white">System Prompt / Instructions</label>
+                    <label class="block font-semibold text-white">System Instructions</label>
                     <textarea 
                         id="systemPromptInput" 
                         rows="3" 
@@ -286,27 +278,10 @@
                 <!-- Temperature Slider -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
-                        <label class="font-semibold text-white">Creativity Temperature</label>
+                        <label class="font-semibold text-white">Temperature</label>
                         <span id="tempValue" class="text-xs font-mono text-brand-400">0.7</span>
                     </div>
                     <input type="range" id="tempSlider" min="0" max="1" step="0.1" value="0.7" class="w-full accent-brand-500 cursor-pointer">
-                </div>
-
-                <!-- Firebase Integration Toggle Section -->
-                <div class="border-t border-darkBorder pt-4 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-semibold text-white">Cloud Sync (Firebase)</span>
-                        <span class="text-[10px] bg-slate-800 text-gray-400 px-2 py-0.5 rounded">Optional</span>
-                    </div>
-                    <p class="text-xs text-gray-400">Enable cloud persistence when you deploy across multiple devices.</p>
-                    <button id="toggleFirebaseSetupBtn" class="text-xs text-brand-400 hover:underline">View Firebase Initialization Code</button>
-                    
-                    <div id="firebaseCodeBox" class="hidden mt-2 p-3 bg-darkBg rounded-xl border border-darkBorder text-[11px] font-mono text-gray-300 overflow-x-auto">
-                        <span class="text-purple-400">const</span> firebaseConfig = {<br>
-                        &nbsp;&nbsp;apiKey: <span class="text-emerald-300">"YOUR_FIREBASE_KEY"</span>,<br>
-                        &nbsp;&nbsp;projectId: <span class="text-emerald-300">"nexus-ai-app"</span><br>
-                        };
-                    </div>
                 </div>
             </div>
 
@@ -318,45 +293,13 @@
         </div>
     </div>
 
-    <!-- Deploy Guide Modal -->
-    <div id="deployModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-darkPanel border border-darkBorder w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-darkBorder flex items-center justify-between bg-darkSidebar">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-rocket text-brand-500"></i>
-                    <h2 class="font-bold text-gray-100 text-base">GitHub to Vercel Guide</h2>
-                </div>
-                <button id="closeDeployBtn" class="text-gray-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <div class="p-6 overflow-y-auto space-y-4 text-xs text-gray-300 leading-relaxed">
-                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
-                    <div class="font-bold text-white text-sm">Step 1: Upload to GitHub</div>
-                    <p class="text-gray-400">Save this application file as <code class="text-brand-300">index.html</code> and push it to a new GitHub repository.</p>
-                </div>
-
-                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
-                    <div class="font-bold text-white text-sm">Step 2: Connect to Vercel</div>
-                    <p class="text-gray-400">Log into Vercel, click <strong>"Add New Project"</strong>, and import your GitHub repository.</p>
-                </div>
-
-                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
-                    <div class="font-bold text-white text-sm">Step 3: Instant Deployment</div>
-                    <p class="text-gray-400">Click <strong>Deploy</strong>. Vercel will host your static single-page app instantly with free SSL!</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Application State
         const state = {
             apiKey: localStorage.getItem('nexus_api_key') || '',
             systemPrompt: localStorage.getItem('nexus_system_prompt') || 'You are Nexus AI, a helpful, precise, and concise assistant.',
             temperature: parseFloat(localStorage.getItem('nexus_temperature')) || 0.7,
-            model: localStorage.getItem('nexus_model') || 'gemini-2.5-flash',
+            model: localStorage.getItem('nexus_selected_model') || 'gemini-3.8-flash',
             conversations: JSON.parse(localStorage.getItem('nexus_conversations') || '[]'),
             currentChatId: null,
             isGenerating: false
@@ -391,11 +334,6 @@
             apiStatusText: document.getElementById('apiStatusText'),
             clearChatBtn: document.getElementById('clearChatBtn'),
             exportChatBtn: document.getElementById('exportChatBtn'),
-            deployGuideBtn: document.getElementById('deployGuideBtn'),
-            deployModal: document.getElementById('deployModal'),
-            closeDeployBtn: document.getElementById('closeDeployBtn'),
-            toggleFirebaseSetupBtn: document.getElementById('toggleFirebaseSetupBtn'),
-            firebaseCodeBox: document.getElementById('firebaseCodeBox'),
             toastContainer: document.getElementById('toastContainer')
         };
 
@@ -436,14 +374,12 @@
 
             elements.openSettingsBtn.addEventListener('click', () => elements.settingsModal.classList.remove('hidden'));
             elements.closeSettingsBtn.addEventListener('click', () => elements.settingsModal.classList.add('hidden'));
-            elements.deployGuideBtn.addEventListener('click', () => elements.deployModal.classList.remove('hidden'));
-            elements.closeDeployBtn.addEventListener('click', () => elements.deployModal.classList.add('hidden'));
 
             elements.tempSlider.addEventListener('input', (e) => elements.tempValue.textContent = e.target.value);
             
             elements.modelSelector.addEventListener('change', (e) => {
                 state.model = e.target.value;
-                localStorage.setItem('nexus_model', state.model);
+                localStorage.setItem('nexus_selected_model', state.model);
                 showToast(`Model set to ${e.target.options[e.target.selectedIndex].text}`, 'info');
             });
 
@@ -480,9 +416,6 @@
 
             elements.clearChatBtn.addEventListener('click', clearCurrentChat);
             elements.exportChatBtn.addEventListener('click', exportCurrentChat);
-            elements.toggleFirebaseSetupBtn.addEventListener('click', () => {
-                elements.firebaseCodeBox.classList.toggle('hidden');
-            });
 
             document.querySelectorAll('.sample-prompt').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -510,12 +443,12 @@
 
         function updateKeyBadge() {
             if (state.apiKey) {
-                elements.keyStatusBadge.textContent = 'Active Key';
+                elements.keyStatusBadge.textContent = 'Key Active';
                 elements.keyStatusBadge.className = 'px-1.5 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800/50';
                 elements.apiStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
                 elements.apiStatusText.textContent = 'Gemini Ready';
             } else {
-                elements.keyStatusBadge.textContent = 'Setup Key';
+                elements.keyStatusBadge.textContent = 'Key Missing';
                 elements.keyStatusBadge.className = 'px-1.5 py-0.5 rounded text-[10px] bg-red-950 text-red-400 border border-red-800/50';
                 elements.apiStatusDot.className = 'w-2 h-2 rounded-full bg-red-500';
                 elements.apiStatusText.textContent = 'Key Missing';
@@ -735,8 +668,7 @@
 
         async function streamGeminiResponse(messages, onChunk) {
             const apiKey = state.apiKey;
-            // Endpoint using correct streamGenerateContent
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${state.model}:streamGenerateContent?alt=sse&key=${apiKey}`;
+            const streamUrl = `https://generativelanguage.googleapis.com/v1beta/models/${state.model}:streamGenerateContent?alt=sse&key=${apiKey}`;
 
             const contents = messages.map(msg => ({
                 role: msg.role === 'user' ? 'user' : 'model',
@@ -753,20 +685,29 @@
                 }
             };
 
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            let response;
+            try {
+                response = await fetch(streamUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (netErr) {
+                throw new Error('Network error connecting to Google API: ' + netErr.message);
+            }
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `API Error (${response.status})`);
+                const apiErrorMsg = errData.error?.message || `API Error (${response.status})`;
+                
+                // Fallback attempt with non-streaming endpoint
+                return await generateContentFallback(payload, apiKey, onChunk, apiErrorMsg);
             }
 
             const reader = response.body.getReader();
             const decoder = new TextDecoder('utf-8');
             let buffer = '';
+            let receivedAnyChunks = false;
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -774,7 +715,7 @@
                 
                 buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split('\n');
-                buffer = lines.pop(); // Keep incomplete line in buffer
+                buffer = lines.pop(); // Retain incomplete chunk
 
                 for (const line of lines) {
                     if (line.startsWith('data: ')) {
@@ -784,13 +725,40 @@
                             const parsed = JSON.parse(jsonStr);
                             const textChunk = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
                             if (textChunk) {
+                                receivedAnyChunks = true;
                                 onChunk(textChunk);
                             }
                         } catch (e) {
-                            // Ignore partial JSON parse errors during SSE stream
+                            // Suppress partial JSON parse errors
                         }
                     }
                 }
+            }
+
+            if (!receivedAnyChunks) {
+                await generateContentFallback(payload, apiKey, onChunk, 'Streaming returned no tokens.');
+            }
+        }
+
+        async function generateContentFallback(payload, apiKey, onChunk, streamErrorMsg) {
+            const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${state.model}:generateContent?key=${apiKey}`;
+            const response = await fetch(fallbackUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || streamErrorMsg);
+            }
+
+            const data = await response.json();
+            const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (textResult) {
+                onChunk(textResult);
+            } else {
+                throw new Error('No content returned from Gemini API.');
             }
         }
 
