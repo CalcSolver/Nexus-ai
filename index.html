@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI - Next-Gen Conversational Intelligence</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f6ff',
+                            100: '#e0edff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        darkBg: '#0b0f17',
+                        darkPanel: '#131b2e',
+                        darkSidebar: '#0d1322',
+                        darkBorder: '#1e293b',
+                        darkHover: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .prose pre {
+            background-color: #0f172a !important;
+            padding: 0 !important;
+            border-radius: 0.5rem;
+            border: 1px solid #1e293b;
+        }
+        .prose code {
+            color: #38bdf8;
+            font-family: monospace;
+        }
+        .prose p {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        .prose p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-gray-100 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-64 bg-darkSidebar border-r border-darkBorder flex flex-col transition-all duration-300 absolute md:relative z-30 h-full -translate-x-full md:translate-x-0">
+        <!-- Brand Header -->
+        <div class="p-4 flex items-center justify-between border-b border-darkBorder">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid font-bold text-white text-sm">N</i>
+                </div>
+                <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Nexus AI</span>
+            </div>
+            <button id="closeSidebarMobileBtn" class="md:hidden text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Action Button -->
+        <div class="p-3">
+            <button id="newChatBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-blue-600 hover:from-brand-500 hover:to-blue-500 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 shadow-md shadow-brand-600/20">
+                <i class="fa-solid fa-plus text-sm"></i>
+                <span>New Conversation</span>
+            </button>
+        </div>
+
+        <!-- Conversation History List -->
+        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1" id="chatHistoryContainer">
+            <!-- Dynamic Chat Items dynamically populated here -->
+        </div>
+
+        <!-- System & Firebase Status Info -->
+        <div class="p-3 border-t border-darkBorder bg-darkBg/40 text-xs text-gray-400 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Gemini Live Ready
+                </span>
+                <span id="keyStatusBadge" class="px-1.5 py-0.5 rounded text-[10px] bg-red-950 text-red-400 border border-red-800/50">Key Needed</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-gray-500 border-t border-darkBorder/50 pt-1.5">
+                <span>Firebase Sync</span>
+                <span id="firebaseStatus" class="text-amber-500">Local Only</span>
+            </div>
+        </div>
+
+        <!-- User Options Footer -->
+        <div class="p-3 border-t border-darkBorder flex items-center justify-between bg-darkSidebar">
+            <button id="openSettingsBtn" class="flex items-center gap-2 text-sm text-gray-300 hover:text-white p-2 rounded-lg hover:bg-darkBorder/50 transition w-full">
+                <i class="fa-solid fa-gear text-gray-400"></i>
+                <span>Settings & Keys</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full bg-darkBg relative overflow-hidden">
+        
+        <!-- Top Navbar -->
+        <header class="h-14 border-b border-darkBorder flex items-center justify-between px-4 bg-darkBg/80 backdrop-blur z-10">
+            <div class="flex items-center gap-3">
+                <button id="openSidebarMobileBtn" class="md:hidden text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="relative">
+                    <button id="modelSelectBtn" class="flex items-center gap-2 text-sm font-medium text-gray-200 hover:text-white bg-darkPanel px-3 py-1.5 rounded-lg border border-darkBorder transition">
+                        <i class="fa-solid fa-bolt text-amber-400 text-xs"></i>
+                        <span id="currentModelDisplay">Gemini 2.5 Flash</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                    </button>
+                    <!-- Model Dropdown -->
+                    <div id="modelDropdown" class="hidden absolute top-full left-0 mt-2 w-56 bg-darkPanel border border-darkBorder rounded-xl shadow-xl z-50 p-1.5 space-y-1">
+                        <button data-model="gemini-2.5-flash-preview" class="model-option w-full text-left p-2 rounded-lg hover:bg-darkBorder flex items-center justify-between text-xs text-gray-200">
+                            <div>
+                                <div class="font-medium text-white">Gemini 2.5 Flash</div>
+                                <div class="text-[10px] text-gray-400">Fast & multi-modal reasoning</div>
+                            </div>
+                            <i class="fa-solid fa-check text-brand-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="exportChatBtn" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-darkPanel transition" title="Export Conversation">
+                    <i class="fa-solid fa-download text-sm"></i>
+                </button>
+                <button id="clearChatBtn" class="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-darkPanel transition" title="Clear Messages">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
+                <button id="deployGuideBtn" class="hidden sm:flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-brand-400 border border-brand-500/30 px-3 py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Deploy Guide</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Chat Messages Container -->
+        <div id="chatContainer" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-4xl mx-auto w-full">
+            
+            <!-- Welcome Hero (Shown when chat is empty) -->
+            <div id="welcomeHero" class="h-full flex flex-col items-center justify-center text-center px-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-purple-600 flex items-center justify-center mb-6 shadow-xl shadow-brand-500/10">
+                    <i class="fa-solid font-bold text-white text-3xl">N</i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">How can Nexus AI help you today?</h1>
+                <p class="text-gray-400 max-w-md text-sm mb-8">Fast, private, and powered by modern intelligence. Configure your local key to get started.</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+                    <button class="sample-prompt p-3 rounded-xl border border-darkBorder bg-darkPanel/50 hover:bg-darkPanel text-left transition group">
+                        <div class="text-xs font-semibold text-brand-400 mb-1 group-hover:text-brand-300">Code Generator</div>
+                        <div class="text-xs text-gray-300">Write a JS function for exponential backoff retries</div>
+                    </button>
+                    <button class="sample-prompt p-3 rounded-xl border border-darkBorder bg-darkPanel/50 hover:bg-darkPanel text-left transition group">
+                        <div class="text-xs font-semibold text-purple-400 mb-1 group-hover:text-purple-300">Creative Writing</div>
+                        <div class="text-xs text-gray-300">Draft a launch post for an open-source tool</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="messageStream" class="space-y-6"></div>
+        </div>
+
+        <!-- Input Area Footer -->
+        <div class="p-4 max-w-4xl mx-auto w-full">
+            <form id="chatForm" class="relative bg-darkPanel border border-darkBorder rounded-2xl shadow-2xl focus-within:border-brand-500 transition-all duration-200">
+                <textarea 
+                    id="userInput" 
+                    rows="1" 
+                    placeholder="Ask Nexus AI anything..." 
+                    class="w-full bg-transparent text-gray-100 placeholder-gray-500 p-4 pr-12 focus:outline-none resize-none max-h-48 text-sm"
+                ></textarea>
+                
+                <div class="flex items-center justify-between px-3 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] text-gray-500 flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-xs text-emerald-500"></i> Client-Side Direct API
+                        </span>
+                    </div>
+                    <button 
+                        type="submit" 
+                        id="sendBtn"
+                        class="w-8 h-8 rounded-lg bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:hover:bg-brand-600 text-white flex items-center justify-center transition shadow-md shadow-brand-600/30"
+                        disabled
+                    >
+                        <i class="fa-solid fa-arrow-up text-xs"></i>
+                    </button>
+                </div>
+            </form>
+            <div class="text-center text-[11px] text-gray-500 mt-2">
+                Nexus AI can make mistakes. Verify critical code and output.
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings & Key Configuration Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-darkPanel border border-darkBorder w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-darkBorder flex items-center justify-between bg-darkSidebar">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-brand-500"></i>
+                    <h2 class="font-bold text-gray-100 text-base">Configuration & Settings</h2>
+                </div>
+                <button id="closeSettingsBtn" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-6 text-sm text-gray-300">
+                
+                <!-- API Key Section -->
+                <div class="space-y-3">
+                    <label class="block font-semibold text-white">Gemini API Key</label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="apiKeyInput" 
+                            placeholder="AIzaSy..." 
+                            class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-sm text-white focus:outline-none focus:border-brand-500 transition pr-10"
+                        >
+                        <button type="button" id="toggleKeyVisibility" class="absolute right-3 top-3.5 text-gray-400 hover:text-white">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-brand-400 hover:underline flex items-center gap-1">
+                            <span>Get Gemini API Key</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                        <button id="clearKeyBtn" class="text-red-400 hover:underline">Remove Key</button>
+                    </div>
+                </div>
+
+                <!-- API Key Security Explanation Banner -->
+                <div class="bg-blue-950/40 border border-blue-800/40 rounded-xl p-4 text-xs leading-relaxed space-y-2">
+                    <div class="font-semibold text-blue-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock text-sm"></i> How Are Your API Keys Stored Safely?
+                    </div>
+                    <p class="text-gray-300">
+                        When using Nexus AI on client-only setups (like GitHub Pages or Vercel static sites):
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-400">
+                        <li><strong>Local Browser Storage:</strong> Keys entered here remain inside your browser's <code class="bg-darkBg px-1 py-0.5 rounded text-blue-300">localStorage</code>. They are never sent to a middleman server.</li>
+                        <li><strong>Vercel Deployment:</strong> When hosting on Vercel, store keys as an Environment Variable named <code class="bg-darkBg px-1 py-0.5 rounded text-blue-300">GEMINI_API_KEY</code> or <code class="bg-darkBg px-1 py-0.5 rounded text-blue-300">NEXT_PUBLIC_GEMINI_API_KEY</code>.</li>
+                        <li><strong>GitHub Safety:</strong> Never commit raw API keys into git source files! Use an <code class="bg-darkBg px-1 py-0.5 rounded text-blue-300">.env</code> file listed in your <code class="bg-darkBg px-1 py-0.5 rounded text-blue-300">.gitignore</code>.</li>
+                    </ul>
+                </div>
+
+                <!-- System Instruction Prompt -->
+                <div class="space-y-2">
+                    <label class="block font-semibold text-white">System Prompt / Persona</label>
+                    <textarea 
+                        id="systemPromptInput" 
+                        rows="3" 
+                        class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-500 transition resize-none"
+                        placeholder="You are Nexus AI, a helpful, precise, and concise AI assistant."
+                    >You are Nexus AI, a helpful, precise, and highly capable AI assistant.</textarea>
+                </div>
+
+                <!-- Temperature Slider -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="font-semibold text-white">Temperature (Creativity)</label>
+                        <span id="tempValue" class="text-xs font-mono text-brand-400">0.7</span>
+                    </div>
+                    <input type="range" id="tempSlider" min="0" max="1" step="0.1" value="0.7" class="w-full accent-brand-500 cursor-pointer">
+                </div>
+
+                <!-- Firebase Configuration Option -->
+                <div class="border-t border-darkBorder pt-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-white">Firebase Integration</span>
+                        <span class="text-[10px] bg-slate-800 text-gray-400 px-2 py-0.5 rounded">Optional</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Add cloud persistence across devices by connecting Firebase Firestore.</p>
+                    <button id="showFirebaseSetupBtn" class="text-xs text-brand-400 hover:underline">View Firebase Setup Snippet</button>
+                    
+                    <div id="firebaseSnippetArea" class="hidden mt-2 p-3 bg-darkBg rounded-xl border border-darkBorder text-[11px] font-mono text-gray-300 overflow-x-auto">
+                        <p class="text-gray-400 mb-1">// To enable cloud save, replace standard window configuration with initialized firebaseConfig</p>
+                        <span class="text-purple-400">const</span> firebaseConfig = { apiKey: <span class="text-emerald-300">"..."</span>, authDomain: <span class="text-emerald-300">"..."</span>, projectId: <span class="text-emerald-300">"..."</span> };
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-darkBorder bg-darkSidebar flex justify-end">
+                <button id="saveSettingsBtn" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-5 py-2 rounded-xl text-sm transition shadow-lg shadow-brand-600/30">
+                    Save Configuration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment Guide Modal -->
+    <div id="deployModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-darkPanel border border-darkBorder w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-darkBorder flex items-center justify-between bg-darkSidebar">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-rocket text-brand-500"></i>
+                    <h2 class="font-bold text-gray-100 text-base">GitHub to Vercel Deployment Workflow</h2>
+                </div>
+                <button id="closeDeployBtn" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-4 text-xs text-gray-300 leading-relaxed">
+                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
+                    <div class="font-bold text-white text-sm">Step 1: Save to GitHub</div>
+                    <p class="text-gray-400">Push your single <code class="text-brand-300">index.html</code> file to a new GitHub repository.</p>
+                </div>
+
+                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
+                    <div class="font-bold text-white text-sm">Step 2: Import into Vercel</div>
+                    <p class="text-gray-400">Sign in to Vercel, click <strong>"Add New Project"</strong>, and import your GitHub repository.</p>
+                </div>
+
+                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
+                    <div class="font-bold text-white text-sm">Step 3: Environment Variables (Recommended)</div>
+                    <p class="text-gray-400">Under <strong>Environment Variables</strong> in Vercel settings, add:</p>
+                    <div class="bg-darkBg p-2 rounded border border-darkBorder font-mono text-emerald-400">
+                        NEXT_PUBLIC_GEMINI_API_KEY = your_gemini_api_key_here
+                    </div>
+                </div>
+
+                <div class="border-l-2 border-brand-500 pl-3 py-1 space-y-1">
+                    <div class="font-bold text-white text-sm">Step 4: Deploy</div>
+                    <p class="text-gray-400">Click <strong>Deploy</strong>. Vercel will host your site instantly with SSL enabled!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        const state = {
+            apiKey: localStorage.getItem('nexus_api_key') || '',
+            systemPrompt: localStorage.getItem('nexus_system_prompt') || 'You are Nexus AI, a helpful, precise, and concise AI assistant.',
+            temperature: parseFloat(localStorage.getItem('nexus_temperature')) || 0.7,
+            model: 'gemini-2.5-flash-preview',
+            conversations: JSON.parse(localStorage.getItem('nexus_conversations') || '[]'),
+            currentChatId: null,
+            isGenerating: false
+        };
+
+        // DOM Elements
+        const elements = {
+            sidebar: document.getElementById('sidebar'),
+            openSidebarMobileBtn: document.getElementById('openSidebarMobileBtn'),
+            closeSidebarMobileBtn: document.getElementById('closeSidebarMobileBtn'),
+            chatHistoryContainer: document.getElementById('chatHistoryContainer'),
+            newChatBtn: document.getElementById('newChatBtn'),
+            chatContainer: document.getElementById('chatContainer'),
+            welcomeHero: document.getElementById('welcomeHero'),
+            messageStream: document.getElementById('messageStream'),
+            chatForm: document.getElementById('chatForm'),
+            userInput: document.getElementById('userInput'),
+            sendBtn: document.getElementById('sendBtn'),
+            settingsModal: document.getElementById('settingsModal'),
+            openSettingsBtn: document.getElementById('openSettingsBtn'),
+            closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+            saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+            apiKeyInput: document.getElementById('apiKeyInput'),
+            toggleKeyVisibility: document.getElementById('toggleKeyVisibility'),
+            clearKeyBtn: document.getElementById('clearKeyBtn'),
+            systemPromptInput: document.getElementById('systemPromptInput'),
+            tempSlider: document.getElementById('tempSlider'),
+            tempValue: document.getElementById('tempValue'),
+            keyStatusBadge: document.getElementById('keyStatusBadge'),
+            clearChatBtn: document.getElementById('clearChatBtn'),
+            exportChatBtn: document.getElementById('exportChatBtn'),
+            deployGuideBtn: document.getElementById('deployGuideBtn'),
+            deployModal: document.getElementById('deployModal'),
+            closeDeployBtn: document.getElementById('closeDeployBtn'),
+            showFirebaseSetupBtn: document.getElementById('showFirebaseSetupBtn'),
+            firebaseSnippetArea: document.getElementById('firebaseSnippetArea')
+        };
+
+        function initApp() {
+            // Setup Marked Options
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true
+            });
+
+            // Initialize Settings Values
+            elements.apiKeyInput.value = state.apiKey;
+            elements.systemPromptInput.value = state.systemPrompt;
+            elements.tempSlider.value = state.temperature;
+            elements.tempValue.textContent = state.temperature;
+
+            updateKeyBadge();
+            renderChatHistory();
+
+            // Setup new chat if none exists
+            if (state.conversations.length === 0) {
+                createNewChat();
+            } else {
+                loadChat(state.conversations[0].id);
+            }
+
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Sidebar Mobile Controls
+            elements.openSidebarMobileBtn.addEventListener('click', () => elements.sidebar.classList.remove('-translate-x-full'));
+            elements.closeSidebarMobileBtn.addEventListener('click', () => elements.sidebar.classList.add('-translate-x-full'));
+
+            // Modal Controls
+            elements.openSettingsBtn.addEventListener('click', () => elements.settingsModal.classList.remove('hidden'));
+            elements.closeSettingsBtn.addEventListener('click', () => elements.settingsModal.classList.add('hidden'));
+            elements.deployGuideBtn.addEventListener('click', () => elements.deployModal.classList.remove('hidden'));
+            elements.closeDeployBtn.addEventListener('click', () => elements.deployModal.classList.add('hidden'));
+
+            // Settings Input Handlers
+            elements.tempSlider.addEventListener('input', (e) => elements.tempValue.textContent = e.target.value);
+            elements.toggleKeyVisibility.addEventListener('click', () => {
+                const type = elements.apiKeyInput.type === 'password' ? 'text' : 'password';
+                elements.apiKeyInput.type = type;
+            });
+
+            elements.clearKeyBtn.addEventListener('click', () => {
+                elements.apiKeyInput.value = '';
+                state.apiKey = '';
+                localStorage.removeItem('nexus_api_key');
+                updateKeyBadge();
+            });
+
+            elements.saveSettingsBtn.addEventListener('click', saveSettings);
+
+            // New Chat and Input Form
+            elements.newChatBtn.addEventListener('click', createNewChat);
+            elements.chatForm.addEventListener('submit', handleSendMessage);
+            
+            // Textarea Auto-Resizing & Enter key submit
+            elements.userInput.addEventListener('input', () => {
+                elements.userInput.style.height = 'auto';
+                elements.userInput.style.height = Math.min(elements.userInput.scrollHeight, 180) + 'px';
+                elements.sendBtn.disabled = !elements.userInput.value.trim() || state.isGenerating;
+            });
+
+            elements.userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (elements.userInput.value.trim() && !state.isGenerating) {
+                        elements.chatForm.requestSubmit();
+                    }
+                }
+            });
+
+            // Action Buttons
+            elements.clearChatBtn.addEventListener('click', clearCurrentChat);
+            elements.exportChatBtn.addEventListener('click', exportCurrentChat);
+            
+            elements.showFirebaseSetupBtn.addEventListener('click', () => {
+                elements.firebaseSnippetArea.classList.toggle('hidden');
+            });
+
+            // Sample prompt click listener
+            document.querySelectorAll('.sample-prompt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const text = btn.querySelector('.text-gray-300').textContent;
+                    elements.userInput.value = text;
+                    elements.userInput.dispatchEvent(new Event('input'));
+                    elements.chatForm.requestSubmit();
+                });
+            });
+        }
+
+        function saveSettings() {
+            state.apiKey = elements.apiKeyInput.value.trim();
+            state.systemPrompt = elements.systemPromptInput.value.trim();
+            state.temperature = parseFloat(elements.tempSlider.value);
+
+            localStorage.setItem('nexus_api_key', state.apiKey);
+            localStorage.setItem('nexus_system_prompt', state.systemPrompt);
+            localStorage.setItem('nexus_temperature', state.temperature);
+
+            updateKeyBadge();
+            elements.settingsModal.classList.add('hidden');
+        }
+
+        function updateKeyBadge() {
+            if (state.apiKey) {
+                elements.keyStatusBadge.textContent = 'Key Active';
+                elements.keyStatusBadge.className = 'px-1.5 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800/50';
+            } else {
+                elements.keyStatusBadge.textContent = 'Key Needed';
+                elements.keyStatusBadge.className = 'px-1.5 py-0.5 rounded text-[10px] bg-red-950 text-red-400 border border-red-800/50';
+            }
+        }
+
+        function createNewChat() {
+            const newChat = {
+                id: 'chat_' + Date.now(),
+                title: 'New Conversation',
+                messages: []
+            };
+            state.conversations.unshift(newChat);
+            state.currentChatId = newChat.id;
+            saveConversations();
+            renderChatHistory();
+            loadChat(newChat.id);
+        }
+
+        function getCurrentChat() {
+            return state.conversations.find(c => c.id === state.currentChatId);
+        }
+
+        function saveConversations() {
+            localStorage.setItem('nexus_conversations', JSON.stringify(state.conversations));
+        }
+
+        function renderChatHistory() {
+            elements.chatHistoryContainer.innerHTML = '';
+            state.conversations.forEach(chat => {
+                const isActive = chat.id === state.currentChatId;
+                const div = document.createElement('div');
+                div.className = `group flex items-center justify-between p-2.5 rounded-xl cursor-pointer text-xs transition ${
+                    isActive ? 'bg-darkPanel text-white font-medium border border-darkBorder' : 'text-gray-400 hover:bg-darkPanel/50 hover:text-gray-200'
+                }`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-2.5 overflow-hidden flex-1">
+                        <i class="fa-regular fa-message text-gray-500"></i>
+                        <span class="truncate">${escapeHtml(chat.title)}</span>
+                    </div>
+                    <button class="delete-chat-btn hidden group-hover:block text-gray-500 hover:text-red-400 p-1" data-id="${chat.id}">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+
+                div.addEventListener('click', (e) => {
+                    if (!e.target.closest('.delete-chat-btn')) {
+                        loadChat(chat.id);
+                    }
+                });
+
+                const deleteBtn = div.querySelector('.delete-chat-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteChat(chat.id);
+                    });
+                }
+
+                elements.chatHistoryContainer.appendChild(div);
+            });
+        }
+
+        function loadChat(chatId) {
+            state.currentChatId = chatId;
+            renderChatHistory();
+            const chat = getCurrentChat();
+
+            elements.messageStream.innerHTML = '';
+            if (!chat || chat.messages.length === 0) {
+                elements.welcomeHero.classList.remove('hidden');
+            } else {
+                elements.welcomeHero.classList.add('hidden');
+                chat.messages.forEach(msg => appendMessageUI(msg.role, msg.text));
+            }
+        }
+
+        function deleteChat(chatId) {
+            state.conversations = state.conversations.filter(c => c.id !== chatId);
+            saveConversations();
+            if (state.conversations.length > 0) {
+                loadChat(state.conversations[0].id);
+            } else {
+                createNewChat();
+            }
+        }
+
+        function clearCurrentChat() {
+            const chat = getCurrentChat();
+            if (chat) {
+                chat.messages = [];
+                saveConversations();
+                loadChat(chat.id);
+            }
+        }
+
+        function exportCurrentChat() {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chat, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `${chat.title.toLowerCase().replace(/\s+/g, '_')}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function appendMessageUI(role, text) {
+            const isUser = role === 'user';
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+
+            const avatar = isUser 
+                ? `<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white shrink-0">You</div>`
+                : `<div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold text-white shrink-0">N</div>`;
+
+            const contentHtml = isUser 
+                ? `<div class="bg-brand-600/20 border border-brand-500/30 text-gray-100 p-3.5 rounded-2xl max-w-2xl text-sm leading-relaxed">${escapeHtml(text)}</div>`
+                : `<div class="prose prose-invert max-w-3xl text-sm text-gray-200 bg-darkPanel border border-darkBorder p-4 rounded-2xl w-full space-y-2">${marked.parse(text)}</div>`;
+
+            wrapper.innerHTML = isUser ? `${contentHtml}${avatar}` : `${avatar}${contentHtml}`;
+            elements.messageStream.appendChild(wrapper);
+
+            // Add Copy Buttons to generated code blocks
+            wrapper.querySelectorAll('pre').forEach(pre => {
+                if (pre.querySelector('.copy-code-btn')) return;
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between bg-darkSidebar px-3 py-1.5 border-b border-darkBorder text-[11px] text-gray-400 rounded-t-lg';
+                header.innerHTML = `<span>Code Snippet</span><button class="copy-code-btn hover:text-white flex items-center gap-1"><i class="fa-regular fa-copy"></i> Copy</button>`;
+                
+                const code = pre.querySelector('code');
+                pre.insertBefore(header, code);
+
+                const copyBtn = header.querySelector('.copy-code-btn');
+                copyBtn.addEventListener('click', () => {
+                    const textToCopy = code.innerText;
+                    const el = document.createElement('textarea');
+                    el.value = textToCopy;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+
+                    copyBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Copied!`;
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy`;
+                    }, 2000);
+                });
+            });
+
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+            return wrapper;
+        }
+
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const text = elements.userInput.value.trim();
+            if (!text || state.isGenerating) return;
+
+            const chat = getCurrentChat();
+            if (!chat) return;
+
+            // Auto-Generate Title from first message
+            if (chat.messages.length === 0) {
+                chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
+                renderChatHistory();
+            }
+
+            // Append User Message
+            chat.messages.push({ role: 'user', text });
+            saveConversations();
+            
+            elements.welcomeHero.classList.add('hidden');
+            appendMessageUI('user', text);
+            
+            // Reset Input
+            elements.userInput.value = '';
+            elements.userInput.style.height = 'auto';
+            elements.sendBtn.disabled = true;
+
+            // Prepare Assistant UI Loading Container
+            state.isGenerating = true;
+            const loadingUI = appendMessageUI('model', '...');
+            const proseContainer = loadingUI.querySelector('.prose');
+
+            try {
+                // Call Gemini API Endpoint
+                const responseText = await callGeminiAPI(chat.messages);
+                proseContainer.innerHTML = marked.parse(responseText);
+                chat.messages.push({ role: 'model', text: responseText });
+                saveConversations();
+            } catch (err) {
+                proseContainer.innerHTML = `<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${escapeHtml(err.message)}</span>`;
+            } finally {
+                state.isGenerating = false;
+                elements.sendBtn.disabled = false;
+            }
+        }
+
+        async function callGeminiAPI(messages) {
+            // API Key lookup priority: Local state -> Window config
+            const apiKey = state.apiKey || '';
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${state.model}:generateContent?key=${apiKey}`;
+
+            // Transform conversation history into Gemini format
+            const contents = messages.map(msg => ({
+                role: msg.role === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.text }]
+            }));
+
+            const payload = {
+                contents: contents,
+                systemInstruction: {
+                    parts: [{ text: state.systemPrompt }]
+                },
+                generationConfig: {
+                    temperature: state.temperature
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                if (response.status === 400 && !apiKey) {
+                    throw new Error("Missing Gemini API key. Please configure your key in Settings.");
+                }
+                throw new Error(errData.error?.message || `API Error (${response.status})`);
+            }
+
+            const data = await response.json();
+            const candidate = data.candidates?.[0];
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                return candidate.content.parts[0].text;
+            } else {
+                throw new Error("Received an empty response from Gemini API.");
+            }
+        }
+
+        // Utility: Sanitization
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Boot application when window loads
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
